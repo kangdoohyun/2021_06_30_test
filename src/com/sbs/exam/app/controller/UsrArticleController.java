@@ -1,5 +1,6 @@
 package com.sbs.exam.app.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -114,6 +115,13 @@ public class UsrArticleController extends Controller {
 		System.out.printf("제목 : %s\n", article.getTitle());
 		System.out.printf("내용 : %s\n", article.getBody());
 		System.out.printf("조회수 : %s\n", article.getHitCount());
+		System.out.printf("좋아요 : %s\n", article.getLikeCount());
+		System.out.printf("싫어요 : %s\n", article.getDislikeCount());
+		String hashtag = "";
+		for(String keyword : article.getKeywordStr()) {
+			hashtag += keyword + " ";
+		}
+		System.out.printf("해시태그 : %s\n", hashtag);
 		
 		article.setHitCount(article.getHitCount() + 1);
 	}
@@ -131,7 +139,7 @@ public class UsrArticleController extends Controller {
 		List<Article> articles = articleService.getArticles();
 		List<Article> filteredArticles = articleService.getFilteredArticles(page, itemsInAPage, boardId, searchKeyword, searchKeywordTypeCode, orderByColumn, orderAscTypeCode);
 		
-		System.out.printf("번호 / 작성날자 / 제목 / 작성자 / 게시판 이름 / 조회수\n");
+		System.out.printf("번호 / 작성날자 / 제목 / 작성자 / 게시판 이름 / 조회수 / 좋아요 / 싫어요\n");
 		
 		if(searchKeyword.length() == 0) {
 			System.out.println("전체 게시물 갯수 :" + articles.size());
@@ -143,7 +151,7 @@ public class UsrArticleController extends Controller {
 		for (Article article : filteredArticles) {
 			Member member = Container.getMemberService().getMemberById(article.getMemberId());
 			Board board = Container.getBoardService().getBoardById(article.getBoardId());
-			System.out.printf("%d / %s / %s / %s / %s / %d\n", article.getId(), article.getRegDate(), article.getTitle(), member.getNickname(), board.getName(), article.getHitCount());
+			System.out.printf("%d / %s / %s / %s / %s / %d / %d / %d\n", article.getId(), article.getRegDate(), article.getTitle(), member.getNickname(), board.getName(), article.getHitCount(), article.getLikeCount(), article.getDislikeCount());
 		}
 	}
 
@@ -164,14 +172,24 @@ public class UsrArticleController extends Controller {
 		
 		int memberId = rq.getLoginedMemberId();
 		int hitCount = 0;
+		int likeCount = 0;
+		int dislikeCount = 0;
 		
 		System.out.println("== " + board.getName() + " 게시판 글 작성 ==");
 		System.out.printf("제목 : ");
 		String title = sc.nextLine().trim();
 		System.out.printf("내용 : ");
 		String body = sc.nextLine().trim();
-
-		int id = articleService.write(boardId, memberId, title, body, hitCount);
+		
+		List<String> keywordStr = new ArrayList<>();
+		String[] keywordStrs = Util.getKeywordsStrFromStr(body).split(" ");
+		
+		for(String keyword : keywordStrs) {
+			keywordStr.add(keyword);
+		}
+		
+		
+		int id = articleService.write(boardId, memberId, title, body, hitCount, likeCount, dislikeCount, keywordStr);
 
 		System.out.printf("%d번 게시물이 생성되었습니다.\n", id);
 	}

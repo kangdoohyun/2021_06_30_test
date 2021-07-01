@@ -1,5 +1,7 @@
 package com.sbs.exam.app.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Article implements Comparable<Article> {
+public class Article  {
 	private int id;
 	private String regDate;
 	private String updateDate;
@@ -16,14 +18,7 @@ public class Article implements Comparable<Article> {
 	private String title;
 	private String body;
 	private int hitCount;
-	
-	@Override
-	public int compareTo(Article article) {
-		if (this.hitCount < article.getHitCount()) {
-            return -1;
-        } else if (this.hitCount > article.getHitCount()) {
-            return 1;
-        }
-        return 0;
-	}
+	private int likeCount;
+	private int dislikeCount;
+	private List<String> keywordStr;
 }
